@@ -64,46 +64,35 @@ while running:
         # 键盘事件处理
         elif event.type == pygame.KEYDOWN:
             if not bag_open:  # 背包关闭状态下的输入映射
-                if event.key == pygame.K_UP:
-                    player.move(0, -1)
-                    player.direction = "up"
-                elif event.key == pygame.K_DOWN:
-                    player.move(0, 1)
-                    player.direction = "down"
-                elif event.key == pygame.K_LEFT:
-                    player.move(-1, 0)
-                    player.direction = "left"
-                elif event.key == pygame.K_RIGHT:
-                    player.move(1, 0)
-                    player.direction = "right"
-                elif event.key == pygame.K_SPACE:
-                    player.interact(grid)
-                elif event.key == pygame.K_b:  # 打开/关闭背包
-                    bag_open = not bag_open
+                key_action_map = {
+                    pygame.K_UP:  lambda: (player.move(0, -1), setattr(player, "direction", "up")),
+                    pygame.K_DOWN: lambda: (player.move(0, 1), setattr(player, "direction", "down")),
+                    pygame.K_LEFT: lambda: (player.move(-1, 0), setattr(player, "direction", "left")),
+                    pygame.K_RIGHT: lambda: (player.move(1, 0), setattr(player, "direction", "right")),
+                    pygame.K_SPACE: lambda: player.interact(grid),
+                    pygame.K_b: lambda: globals().update(bag_open=not bag_open)
+                }
+                action = key_action_map.get(event.key)
+                if action:
+                    action()
             else:  # 背包打开状态下的输入映射
                 if event.key == pygame.K_b:  # 关闭背包
                     bag_open = not bag_open
-                # 可以添加背包内的物品选择逻辑
-                elif event.key == pygame.K_1:
-                    selected_bag_index = 0
-                elif event.key == pygame.K_2:
-                    selected_bag_index = 1
-                elif event.key == pygame.K_3:
-                    selected_bag_index = 2
-                elif event.key == pygame.K_4:
-                    selected_bag_index = 3
-                elif event.key == pygame.K_5:
-                    selected_bag_index = 4
-                elif event.key == pygame.K_6:
-                    selected_bag_index = 5
-                elif event.key == pygame.K_7:
-                    selected_bag_index = 6
-                elif event.key == pygame.K_8:
-                    selected_bag_index = 7
-                elif event.key == pygame.K_9:
-                    selected_bag_index = 8
-                elif event.key == pygame.K_0:
-                    selected_bag_index = 9
+                else:
+                    bag_key_map = {
+                        pygame.K_1: 0,
+                        pygame.K_2: 1,
+                        pygame.K_3: 2,
+                        pygame.K_4: 3,
+                        pygame.K_5: 4,
+                        pygame.K_6: 5,
+                        pygame.K_7: 6,
+                        pygame.K_8: 7,
+                        pygame.K_9: 8,
+                        pygame.K_0: 9
+                    }
+                    if event.key in bag_key_map:
+                        selected_bag_index = bag_key_map[event.key]
     
     # 定时更新
     if current_time - last_update_time > 0.5:
